@@ -32,7 +32,7 @@ sample_model_remove:
 aurora_model_install:
 		@cd build/datapath; sudo insmod $(AURORAMODEL).ko
 
-sample_model_remove:
+aurora_model_remove:
 		sudo rmmod $(AURORAMODEL)
 
 clean:

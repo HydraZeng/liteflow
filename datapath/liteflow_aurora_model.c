@@ -13,6 +13,7 @@
 static void aurora_layer1_comp (s64 *input, s64 *output);
 static void aurora_layer2_comp (s64 *input, s64 *output);
 static void aurora_layer3_comp (s64 *input, s64 *output);
+s64 appro_tanh(s64 input, u32 input_is_scalar);
 
 struct model_container aurora_model __read_mostly = {
     .uuid = AURORA_MODEL_UUID,
@@ -50,7 +51,7 @@ static void construct_aurora_model(void)
 }
 
 // default scalar factor = 1e6
-s64 tanh(s64 input, u32 input_is_scalar)
+s64 appro_tanh(s64 input, u32 input_is_scalar)
 {
     u32 power_times = 0;
     u32 scalar = 1000000;
@@ -101,7 +102,7 @@ static void aurora_layer1_comp (s64 *input, s64 *output)
         for (input_pos = 0; input_pos < 6; input_pos++) {
             temp_result += input[input_pos] * weight;
         }
-        output[output_pos] = tanh(temp_result, 0);
+        output[output_pos] = appro_tanh(temp_result, 0);
     }
 }
 
@@ -115,7 +116,7 @@ static void aurora_layer2_comp (s64 *input, s64 *output)
         for (input_pos = 0; input_pos < 16; input_pos++) {
             temp_result += input[input_pos] * weight;
         }
-        output[output_pos] = tanh(temp_result, 0);
+        output[output_pos] = appro_tanh(temp_result, 0);
     }
 }
 
@@ -129,7 +130,7 @@ static void aurora_layer3_comp (s64 *input, s64 *output)
         for (input_pos = 0; input_pos < 32; input_pos++) {
             temp_result += input[input_pos] * weight;
         }
-        output[output_pos] = tanh(temp_result, 0);
+        output[output_pos] = appro_tanh(temp_result, 0);
     }
 }
 
