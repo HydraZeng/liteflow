@@ -16,7 +16,7 @@ static s64 output_vector[1];
 static void aurora_layer1_comp (s64 *input, s64 *output);
 static void aurora_layer2_comp (s64 *input, s64 *output);
 static void aurora_layer3_comp (s64 *input, s64 *output);
-s64 appro_tanh(s64 input, u32 input_is_scalar);
+s64 appro_tanh(s64 input);
 
 struct model_container aurora_model __read_mostly = {
     .uuid = AURORA_MODEL_UUID,
@@ -53,44 +53,31 @@ static void construct_aurora_model(void)
     list_add(&aurora_layer3.list, &aurora_layer2.list);
 }
 
-// default scalar factor = 1e6
-s64 appro_tanh(s64 input, u32 input_is_scalar)
+static s64 mon_comp(s64 input, u32 power) {
+    u32 power_times;
+    s64 result = 1;
+
+    for (power_times = 0; power_times < power; power_times++) {
+        result = result * input / (power_times + 1);
+    }
+
+    return result;
+}
+
+s64 appro_tanh(s64 input)
 {
+    u32 appro_level = 4;
     u32 power_times = 0;
-    u32 scalar = 1000000;
-    s64 temp2_result = scalar;
-    s64 temp3_result = scalar;
-    s64 temp4_result = scalar;
+    s64 sinh = 0;
+    s64 cosh = 0;
     s64 result = 0;
 
-    if (input_is_scalar == 0) {
-        input *= scalar;
+    for (power_times = 0; power_times < appro_level; power_times++) {
+        sinh += mon_comp(input, 2 * power_times + 1);
+        cosh += mon_comp(input, 2 * power_times);
     }
 
-    // temp2_result = - x^(3) / 3 * scalar
-    for (power_times = 0; power_times < 3; power_times++) {
-        temp2_result = temp2_result * input / scalar;
-    }
-    temp2_result /= -3;
-
-    // temp3_result = 2 * x^(5) / 15 * scalar
-    for (power_times = 0; power_times < 5; power_times++) {
-        temp3_result = temp3_result * input / scalar;
-    } 
-    temp3_result = temp3_result * 2 / 15;
-
-    // temp4_result = -17 * x^(7) / 315 * scalar
-    for (power_times = 0; power_times < 7; power_times++) {
-        temp4_result = temp4_result * input / scalar;
-    }
-    temp4_result = temp4_result * (-17) / 315;
-
-    // result = (x - x^(3)/3 + 2*x^(5)/15 - 17*x^(7)/315) * scalar
-    result = input + temp2_result + temp3_result + temp4_result;
-
-    if (input_is_scalar == 0){
-        result /= scalar;
-    }
+    result = sinh / cosh;
     
     return result;
 }
@@ -105,7 +92,7 @@ static void aurora_layer1_comp (s64 *input, s64 *output)
         for (input_pos = 0; input_pos < 6; input_pos++) {
             temp_result += input[input_pos] * weight;
         }
-        output[output_pos] = appro_tanh(temp_result, 0);
+        output[output_pos] = appro_tanh(temp_result);
     }
 }
 
@@ -119,7 +106,7 @@ static void aurora_layer2_comp (s64 *input, s64 *output)
         for (input_pos = 0; input_pos < 16; input_pos++) {
             temp_result += input[input_pos] * weight;
         }
-        output[output_pos] = appro_tanh(temp_result, 0);
+        output[output_pos] = appro_tanh(temp_result);
     }
 }
 
@@ -133,7 +120,7 @@ static void aurora_layer3_comp (s64 *input, s64 *output)
         for (input_pos = 0; input_pos < 32; input_pos++) {
             temp_result += input[input_pos] * weight;
         }
-        output[output_pos] = appro_tanh(temp_result, 0);
+        output[output_pos] = appro_tanh(temp_result);
     }
 }
 
