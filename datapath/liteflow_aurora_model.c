@@ -10,6 +10,9 @@
 #define AURORA_APP_ID 2
 #define AURORA_MODEL_UUID 101
 
+static s64 input_vector[6] = {1, 2, 3, 4, 5, 6};
+static s64 output_vector[1];
+
 static void aurora_layer1_comp (s64 *input, s64 *output);
 static void aurora_layer2_comp (s64 *input, s64 *output);
 static void aurora_layer3_comp (s64 *input, s64 *output);
@@ -150,6 +153,11 @@ __init liteflow_aurora_model_init(void)
 
     lf_activate_model(AURORA_APP_ID, AURORA_MODEL_UUID);
     lf_query_model(AURORA_APP_ID, NULL, NULL);
+
+    printk(KERN_INFO "Sample output:\n");
+    for (pos = 0; pos < 1; ++pos) {
+        printk(KERN_INFO "pos %u: %lld\n", pos, output_vector[pos]);
+    }
 
     return 0;
 }
