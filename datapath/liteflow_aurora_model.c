@@ -146,13 +146,15 @@ struct app aurora_app = {
 static int
 __init liteflow_aurora_model_init(void)
 {
+    u32 pos;
+
     lf_register_app(&aurora_app);
 
     construct_aurora_model();
     lf_register_model(AURORA_APP_ID, &aurora_model);
 
     lf_activate_model(AURORA_APP_ID, AURORA_MODEL_UUID);
-    lf_query_model(AURORA_APP_ID, NULL, NULL);
+    lf_query_model(AURORA_APP_ID, input_vector, output_vector);
 
     printk(KERN_INFO "Sample output:\n");
     for (pos = 0; pos < 1; ++pos) {
