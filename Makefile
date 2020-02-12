@@ -3,6 +3,7 @@ SHELL := /bin/bash
 MODULENAME := lf_kernel
 SAMPLEAPP := lf_sample_app
 SAMPLEMODEL := lf_sample_model
+AURORAMODEL := lf_aurora_model
 
 module:
 		-@mkdir build
@@ -27,6 +28,12 @@ sample_model_install:
 
 sample_model_remove:
 		sudo rmmod $(SAMPLEMODEL)
+
+aurora_model_install:
+		@cd build/datapath; sudo insmod $(AURORAMODEL).ko
+
+sample_model_remove:
+		sudo rmmod $(AURORAMODEL)
 
 clean:
 		-@rm -rf build
