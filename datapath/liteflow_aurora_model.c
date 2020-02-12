@@ -10,6 +10,8 @@
 #define AURORA_APP_ID 2
 #define AURORA_MODEL_UUID 101
 
+#define APPRO_LEVEL 10
+
 static s64 input_vector[6] = {1, 2, 3, 4, 5, 6};
 static s64 output_vector[1];
 
@@ -66,13 +68,12 @@ static s64 mon_comp(s64 input, u32 power) {
 
 s64 appro_tanh(s64 input)
 {
-    u32 appro_level = 4;
     u32 power_times = 0;
     s64 sinh = 0;
     s64 cosh = 0;
     s64 result = 0;
 
-    for (power_times = 0; power_times < appro_level; power_times++) {
+    for (power_times = 0; power_times < APPRO_LEVEL; power_times++) {
         sinh += mon_comp(input, 2 * power_times + 1);
         cosh += mon_comp(input, 2 * power_times);
     }
@@ -89,7 +90,7 @@ static void aurora_layer1_comp (s64 *input, s64 *output)
     s32 weight = 1;
 
     for (output_pos = 0; output_pos < 32; output_pos ++) {
-        for (input_pos = 0; input_pos < 6; input_pos++) {
+        for (temp_result = 0, input_pos = 0; input_pos < 6; input_pos++) {
             temp_result += input[input_pos] * weight;
         }
         output[output_pos] = appro_tanh(temp_result);
@@ -102,8 +103,8 @@ static void aurora_layer2_comp (s64 *input, s64 *output)
     s64 temp_result = 0;
     s32 weight = 1;
 
-    for (output_pos = 0; output_pos < 1; output_pos ++) {
-        for (input_pos = 0; input_pos < 16; input_pos++) {
+    for (output_pos = 0; output_pos < 16; output_pos ++) {
+        for (temp_result = 0, input_pos = 0; input_pos < 32; input_pos++) {
             temp_result += input[input_pos] * weight;
         }
         output[output_pos] = appro_tanh(temp_result);
@@ -116,8 +117,8 @@ static void aurora_layer3_comp (s64 *input, s64 *output)
     s64 temp_result = 0;
     s32 weight = 1;
 
-    for (output_pos = 0; output_pos < 16; output_pos ++) {
-        for (input_pos = 0; input_pos < 32; input_pos++) {
+    for (output_pos = 0; output_pos < 1; output_pos ++) {
+        for (temp_result = 0, input_pos = 0; input_pos < 16; input_pos++) {
             temp_result += input[input_pos] * weight;
         }
         output[output_pos] = appro_tanh(temp_result);
